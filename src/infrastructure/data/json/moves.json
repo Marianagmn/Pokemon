@@ -1,0 +1,10 @@
+[
+  {
+    "id": "tackle",
+    "name": "Tackle",
+    "type": "NORMAL",
+    "category": "PHYSICAL",
+    "power": 40,
+    "accuracy": 100
+  }
+]
