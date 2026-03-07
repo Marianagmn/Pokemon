@@ -48,41 +48,138 @@ Core Engine – Controls the overall flow of the game.
 
 This separation improves maintainability, testability, and future scalability.
 
-## Project Structure
-src/main/java/com/pokemon
+## 📂 Estructura de Directorios (Tree)
 
-app
-Main entry point of the application
+La jerarquía del código fuente `src/` está organizada de manera Hexagonal estricta:
 
-core
-Game engine and game manager
+```text
+src/
+├── adapters/                # ADAPTADORES (Implementaciones concretas)
+│   ├── inbound/             # Controladores que inyectan datos a la aplicación
+│   │   ├── engine/          # GameLoop y framework de sistema principal
+│   │   │   ├── GameConfig.java
+│   │   │   ├── GameEngine.java
+│   │   │   ├── GameManager.java
+│   │   │   └── GameState.java
+│   │   └── ui/              # Interfaces de usuario
+│   │       ├── BattleUI.java
+│   │       ├── ConsoleUI.java
+│   │       ├── MenuSystem.java
+│   │       └── TrainerUI.java
+│   └── outbound/            # Conexiones hacia recursos externos
+│       ├── events/          # Bus de Eventos
+│       │   └── InMemoryEventBus.java
+│       ├── persistence/     # Bases de datos y Repositorios JSON
+│       │   ├── JsonPokemonSpeciesRepository.java
+│       │   ├── PokemonRepositoryImpl.java
+│       │   ├── SaveRepositoryImpl.java
+│       │   └── TrainerRepositoryImpl.java
+│       └── random/          # Generadores de entropía y azar
+│           └── JavaRandomAdapter.java
+├── application/             # CASOS DE USO (La "Screaming Architecture")
+│   ├── commands/            # DTOs de control
+│   │   ├── CapturePokemonCommand.java
+│   │   └── ExecuteTurnCommand.java
+│   ├── ports/               # Interfaces requeridas (Inversión de Dependencias)
+│   │   ├── DomainEventPublisherPort.java
+│   │   ├── PokemonRepositoryPort.java
+│   │   ├── PokemonSpeciesRepositoryPort.java
+│   │   ├── RandomPort.java
+│   │   ├── SaveRepositoryPort.java
+│   │   └── TrainerRepositoryPort.java
+│   └── usecases/            # Coordinadores de flujo
+│       ├── CapturePokemonUseCase.java
+│       ├── ExecuteTurnUseCase.java
+│       ├── GainExperienceUseCase.java
+│       ├── HealPokemonUseCase.java
+│       └── StartBattleUseCase.java
+├── bootstrap/               # Punto de entrada y configuración
+│   ├── GameModule.java      
+│   └── Main.java            
+├── domain/                  # CORE PURO (Reglas Negocio, Cero dependencias externas)
+│   ├── battle/              # Lógica de turnos y daños
+│   │   ├── Battle.java      # (Aggregate Root)
+│   │   ├── BattleAction.java
+│   │   ├── BattleContext.java
+│   │   ├── BattleResult.java
+│   │   ├── BattleSystem.java
+│   │   ├── DamageCalculator.java
+│   │   ├── TurnManager.java
+│   │   ├── TypeEffectivenessMatrix.java # Matemáticas de tipos
+│   │   ├── pipeline/        # Damage Pipeline (Chain of Responsibility)
+│   │   │   ├── CriticalModifier.java
+│   │   │   ├── DamageModifier.java
+│   │   │   ├── DamagePipeline.java
+│   │   │   ├── StabModifier.java
+│   │   │   ├── TypeModifier.java
+│   │   │   └── WeatherModifier.java
+│   │   └── state/           # Battle State Machine (Patrón State)
+│   │       ├── BattleEndedState.java
+│   │       ├── BattleStartState.java
+│   │       ├── BattleState.java
+│   │       ├── EnemyTurnState.java
+│   │       ├── PlayerTurnState.java
+│   │       └── ResolveTurnState.java
+│   ├── enums/               # Constantes de dominio
+│   │   ├── ItemType.java
+│   │   ├── MoveCategory.java
+│   │   ├── PokemonType.java
+│   │   ├── StatusEffect.java
+│   │   └── WeatherType.java
+│   ├── events/              # Eventos del negocio puros
+│   │   ├── BattleEndedEvent.java
+│   │   ├── BattleStartedEvent.java
+│   │   ├── EventListener.java
+│   │   ├── ItemUsedEvent.java
+│   │   ├── PokemonCapturedEvent.java
+│   │   ├── PokemonFaintedEvent.java
+│   │   └── PokemonLeveledUpEvent.java
+│   ├── factory/             
+│   │   └── PokemonFactory.java          # Depende abstracciones (Port)
+│   ├── model/               # Entidades y Aggregates principales
+│   │   ├── Ability.java
+│   │   ├── Item.java
+│   │   ├── Move.java
+│   │   ├── Pokemon.java     # (Entity)
+│   │   ├── PokemonSpecies.java
+│   │   ├── Stats.java
+│   │   ├── Trainer.java     # (Aggregate Root)
+│   │   ├── inventory/
+│   │   │   └── Inventory.java
+│   │   ├── moves/
+│   │   │   ├── PhysicalMove.java
+│   │   │   ├── SpecialMove.java
+│   │   │   └── StatusMove.java
+│   │   └── vo/              # Value Objects (Semántica sobre primitivos)
+│   │       ├── Experience.java
+│   │       ├── HP.java
+│   │       ├── Level.java
+│   │       └── Money.java
+│   ├── services/            # Domain Services (Orquestadores internos de dominio)
+│   │   ├── CaptureService.java
+│   │   └── ExperienceService.java
+│   └── world/               # Entorno lógico espacial
+│       ├── Facility.java
+│       ├── Location.java
+│       ├── Region.java
+│       ├── Route.java
+│       └── WildEncounter.java
+└── infrastructure/          # Configuración externa y Parsers Raw
+    ├── data/                # Archivos JSON crudos y sus Loaders inyectables
+    │   ├── json/
+    │   │   ├── items.json
+    │   │   ├── moves.json
+    │   │   └── pokemon.json
+    │   └── loaders/
+    │       ├── AbilityDataLoader.java
+    │       ├── ItemDataLoader.java
+    │       ├── MoveDataLoader.java
+    │       └── PokemonDataLoader.java
+    ├── registry/
+    │       └── PokemonRegistry.java    
+    └── utils/               # Utilidades estáticas
+        └── Logger.java
 
-model
-Domain entities (Pokemon, Trainer, Move, Item, Ability)
-
-battle
-Battle engine and combat logic
-
-services
-Game logic services
-
-interfaces
-Reusable behaviors
-
-enums
-Game constants (types, statuses)
-
-world
-Game locations and environment
-
-repository
-Persistence layer
-
-ui
-User interaction system
-
-utils
-Utility classes
 
 ## Core Concepts
 Pokémon
