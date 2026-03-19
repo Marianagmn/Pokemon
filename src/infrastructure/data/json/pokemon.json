@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Bulbasaur",
+    "types": ["GRASS", "POISON"],
+    "baseStats": { "hp": 45, "attack": 49, "defense": 49, "spAttack": 65, "spDefense": 65, "speed": 45 }
+  },
+  {
+    "id": 4,
+    "name": "Charmander",
+    "types": ["FIRE"],
+    "baseStats": { "hp": 39, "attack": 52, "defense": 43, "spAttack": 60, "spDefense": 50, "speed": 65 }
+  },
+  {
+    "id": 25,
+    "name": "Pikachu",
+    "types": ["ELECTRIC"],
+    "baseStats": { "hp": 35, "attack": 55, "defense": 40, "spAttack": 50, "spDefense": 50, "speed": 90 }
+  }
+]

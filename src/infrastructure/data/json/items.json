@@ -1,0 +1,8 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "type": "HEALING",
+    "effectValue": 20
+  }
+]
