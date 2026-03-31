@@ -136,6 +136,14 @@ public record Experience(int value) implements Comparable<Experience> {
         return this.compareTo(other) < 0;
     }
 
+    public boolean isGreaterOrEqual(Experience other) {
+        return this.compareTo(other) >= 0;
+    }
+
+    public boolean isLessOrEqual(Experience other) {
+        return this.compareTo(other) <= 0;
+    }
+
     // ── Internal helpers ─────────────────────────────────────
 
     /**
